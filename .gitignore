@@ -1,0 +1,34 @@
+# Environment and local credentials
+.env
+.env.*
+!.env.example
+
+# Runtime uploads
+audios/*.webm
+audios/*.mp3
+audios/*.wav
+audios/*.ogg
+!audios/.gitkeep
+
+# PHP dependencies and tooling
+vendor/
+.phpunit.result.cache
+
+# Node/build artifacts, if frontend tooling is added later
+node_modules/
+dist/
+build/
+
+# Caches and temporary files
+__pycache__/
+.pytest_cache/
+.cache/
+*.log
+*.tmp
+*.bak
+
+# IDE/editor
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

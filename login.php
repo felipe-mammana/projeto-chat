@@ -25,7 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
         $login = $stmt->get_result()->fetch_assoc();
 
-        if ($login && $senha === $login['senha']) {
+        $senhaValida = $login && (
+            password_verify($senha, $login['senha']) ||
+            hash_equals($login['senha'], $senha)
+        );
+
+        if ($senhaValida) {
 
             $_SESSION['id_login'] = $login['id_login'];
             $_SESSION['tipo']     = $login['tipo'];

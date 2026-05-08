@@ -10,32 +10,32 @@ if ($_SESSION['tipo'] !== 'prof') {
 
 $id_login = intval($_POST['id_login']);
 if (!$id_login) {
-    die("ID inválido.");
+    die("ID invalido.");
 }
 
 $cone->begin_transaction();
 
 try {
-    // Descobre tipo
     $stmt = $cone->prepare("SELECT tipo FROM tb_login WHERE id_login = ?");
     $stmt->bind_param("i", $id_login);
     $stmt->execute();
     $tipo = $stmt->get_result()->fetch_assoc()['tipo'];
 
-    // Remove perfil
     if ($tipo === 'user') {
-        $cone->query("DELETE FROM tb_user WHERE id_login = $id_login");
+        $stmt = $cone->prepare("DELETE FROM tb_user WHERE id_login = ?");
     } else {
-        $cone->query("DELETE FROM tb_professor WHERE id_login = $id_login");
+        $stmt = $cone->prepare("DELETE FROM tb_professor WHERE id_login = ?");
     }
+    $stmt->bind_param("i", $id_login);
+    $stmt->execute();
 
-    // Remove login
-    $cone->query("DELETE FROM tb_login WHERE id_login = $id_login");
+    $stmt = $cone->prepare("DELETE FROM tb_login WHERE id_login = ?");
+    $stmt->bind_param("i", $id_login);
+    $stmt->execute();
 
     $cone->commit();
     header("Location: admin_usuarios.php");
-
 } catch (Exception $e) {
     $cone->rollback();
-    die("Erro ao excluir usuário: " . $e->getMessage());
+    die("Erro ao excluir usuario: " . $e->getMessage());
 }

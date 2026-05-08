@@ -37,13 +37,17 @@ try {
     // Se mudou tipo → mover registro
     if ($atual !== $tipo) {
         if ($atual === 'user') {
-            $cone->query("DELETE FROM tb_user WHERE id_login = $id_login");
+            $stmtDelete = $cone->prepare("DELETE FROM tb_user WHERE id_login = ?");
+            $stmtDelete->bind_param("i", $id_login);
+            $stmtDelete->execute();
             $stmt = $cone->prepare("
                 INSERT INTO tb_professor (id_login, nome, online)
                 VALUES (?, ?, 0)
             ");
         } else {
-            $cone->query("DELETE FROM tb_professor WHERE id_login = $id_login");
+            $stmtDelete = $cone->prepare("DELETE FROM tb_professor WHERE id_login = ?");
+            $stmtDelete->bind_param("i", $id_login);
+            $stmtDelete->execute();
             $stmt = $cone->prepare("
                 INSERT INTO tb_user (id_login, nome, online)
                 VALUES (?, ?, 0)

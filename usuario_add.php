@@ -13,29 +13,29 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$nome  = trim($_POST['nome']);
+$nome = trim($_POST['nome']);
 $email = trim($_POST['email']);
 $senha = trim($_POST['senha']);
-$tipo  = $_POST['tipo'];
+$tipo = $_POST['tipo'];
 
 if (!$nome || !$email || !$senha || !in_array($tipo, ['user', 'prof'])) {
-    die("Dados inválidos.");
+    die("Dados invalidos.");
 }
 
 $cone->begin_transaction();
 
 try {
-    // 1️⃣ LOGIN
+    $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+
     $stmt = $cone->prepare("
         INSERT INTO tb_login (email, senha, tipo, ativo)
         VALUES (?, ?, ?, 1)
     ");
-    $stmt->bind_param("sss", $email, $senha, $tipo);
+    $stmt->bind_param("sss", $email, $senhaHash, $tipo);
     $stmt->execute();
 
     $id_login = $stmt->insert_id;
 
-    // 2️⃣ PERFIL
     if ($tipo === 'user') {
         $stmt = $cone->prepare("
             INSERT INTO tb_user (id_login, nome, online)
@@ -53,8 +53,7 @@ try {
 
     $cone->commit();
     header("Location: admin_usuarios.php");
-
 } catch (Exception $e) {
     $cone->rollback();
-    die("Erro ao criar usuário: " . $e->getMessage());
+    die("Erro ao criar usuario: " . $e->getMessage());
 }

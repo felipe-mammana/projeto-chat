@@ -15,6 +15,20 @@ if (!$id_prof || !$sala_id || !isset($_FILES['audio'])) {
     exit("dados invalidos");
 }
 
+$maxBytes = 10 * 1024 * 1024;
+if ($_FILES['audio']['size'] <= 0 || $_FILES['audio']['size'] > $maxBytes) {
+    http_response_code(400);
+    exit("audio invalido");
+}
+
+$finfo = new finfo(FILEINFO_MIME_TYPE);
+$mime = $finfo->file($_FILES['audio']['tmp_name']);
+$allowedMimes = ['audio/webm', 'video/webm', 'application/octet-stream'];
+if (!in_array($mime, $allowedMimes, true)) {
+    http_response_code(400);
+    exit("tipo de audio invalido");
+}
+
 /* BUSCA ID REAL DO USER */
 $stmt = $cone->prepare("SELECT id_user FROM tb_user WHERE id_login = ?");
 $stmt->bind_param("i", $id_login);
@@ -36,7 +50,7 @@ if (!is_dir($dir)) {
 }
 
 /* NOME DO ARQUIVO */
-$nome = "audio_" . time() . "_" . rand(100,999) . ".webm";
+$nome = "audio_" . time() . "_" . random_int(100, 999) . ".webm";
 $caminho = $dir . $nome;
 
 /* MOVE O ARQUIVO */
